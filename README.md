@@ -232,6 +232,17 @@ The project emphasizes:
 
 ---
 
+## ⚠️ Dataset License Notice
+
+This repository uses the MVTec Anomaly Detection Dataset.
+
+The dataset is **not included** in this repository and is subject to its own license terms.  
+Users must download it separately and comply with its licensing conditions.
+
+For academic use, please cite the dataset as described below.
+
+---
+
 ## 📚 Attribution
 
 If you use the dataset in scientific work, please cite:
