@@ -131,17 +131,19 @@ All modules are integrated into a single workflow for:
 industrial-vision-defect-detection/
 │
 ├── data/                  # Dataset
-├── outputs/               # Saved results & visualizations
+├── outputs/
+├── modules/               # Saved results & visualizations
+│     │
+│     ├── classification.py
+│     ├── harris.py
+│     ├── preprocessing.py
+│     ├── pyramid.py
+│     ├── segmentation.py
+│     └── sift_matching.py
 │
-├── preprocessing.py
-├── harris.py
-├── pyramid.py
-├── sift_matching.py
-├── segmentation.py
-├── classification.py
-├── pipeline.py
 │
 ├── utils.py
+├── main.py
 ├── requirements.txt
 └── README.md
 ```
