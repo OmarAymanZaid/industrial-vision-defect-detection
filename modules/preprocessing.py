@@ -1,1 +1,95 @@
-# preprocessing
+import cv2
+import numpy as np
+import os
+
+# -----------------------------
+# Metrics
+# -----------------------------
+def compute_mse(img1, img2):
+    return np.mean((img1.astype("float") - img2.astype("float")) ** 2)
+
+
+def compute_psnr(img1, img2):
+    mse = compute_mse(img1, img2)
+    if mse == 0:
+        return float("inf")
+    PIXEL_MAX = 255.0
+    return 20 * np.log10(PIXEL_MAX / np.sqrt(mse))
+
+
+# -----------------------------
+# Filters
+# -----------------------------
+def apply_gaussian(gray, kernel_size=(5, 5)):
+    return cv2.GaussianBlur(gray, kernel_size, 0)
+
+
+def apply_median(gray, ksize=5):
+    return cv2.medianBlur(gray, ksize)
+
+
+# -----------------------------
+# Core Preprocessing
+# -----------------------------
+def preprocess_image(img):
+    """
+    Input:
+        img: BGR image
+    Returns:
+        dict with processed images + metrics
+    """
+
+    # Convert to grayscale
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+    # Apply filters
+    gaussian = apply_gaussian(gray)
+    median = apply_median(gray)
+
+    # Compute metrics (compare with original gray)
+    mse_gaussian = compute_mse(gray, gaussian)
+    mse_median = compute_mse(gray, median)
+
+    psnr_gaussian = compute_psnr(gray, gaussian)
+    psnr_median = compute_psnr(gray, median)
+
+    results = {
+        "gray": gray,
+        "gaussian": gaussian,
+        "median": median,
+        "metrics": {
+            "gaussian": {
+                "mse": mse_gaussian,
+                "psnr": psnr_gaussian,
+            },
+            "median": {
+                "mse": mse_median,
+                "psnr": psnr_median,
+            },
+        },
+    }
+
+    return results
+
+
+# -----------------------------
+# Saving Utilities
+# -----------------------------
+def save_results(results, output_dir, image_name="image"):
+    os.makedirs(output_dir, exist_ok=True)
+
+    cv2.imwrite(os.path.join(output_dir, f"{image_name}_gray.png"), results["gray"])
+    cv2.imwrite(os.path.join(output_dir, f"{image_name}_gaussian.png"), results["gaussian"])
+    cv2.imwrite(os.path.join(output_dir, f"{image_name}_median.png"), results["median"])
+
+
+# -----------------------------
+# Logging
+# -----------------------------
+def print_metrics(metrics):
+    print("\n=== Preprocessing Metrics ===")
+
+    for method, values in metrics.items():
+        print(f"\n[{method.upper()}]")
+        print(f"MSE  : {values['mse']:.4f}")
+        print(f"PSNR : {values['psnr']:.4f}")
