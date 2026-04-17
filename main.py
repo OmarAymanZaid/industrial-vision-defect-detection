@@ -14,7 +14,7 @@ from modules.sift_matching import *
 # -----------------------------
 def get_data_path():
     if os.path.exists("/kaggle/input"):
-        return "/kaggle/input/mvtec-ad"
+        return "/kaggle/input/datasets/ipythonx/mvtec-ad"
     return "data"
 
 
