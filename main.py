@@ -8,6 +8,7 @@ from modules.preprocessing import *
 from modules.pyramid import *
 from modules.segmentation import *
 from modules.sift_matching import *
+from modules.utils import *
 
 # -----------------------------
 # Detect environment
@@ -21,35 +22,34 @@ def get_data_path():
 # -----------------------------
 # Main
 # -----------------------------
-def run_preprocessing(category="bottle"):
+# -----------------------------
+def run_batch_preprocessing(category="bottle"):
     DATA_PATH = get_data_path()
 
-    # Pick ONE sample image (start simple)
-    sample_path = os.path.join(
+    print(f"\nLoading dataset: {category}")
+
+    image_paths = load_image_paths(
         DATA_PATH,
-        category,
-        "train",
-        "good"
+        category=category,
+        split="train",   # start with train (good images)
+        max_images=100   # limit for speed (you can remove later)
     )
 
-    # Get first image
-    img_name = os.listdir(sample_path)[0]
-    img_path = os.path.join(sample_path, img_name)
+    print(f"Total images loaded: {len(image_paths)}")
 
-    print(f"Processing: {img_path}")
-
-    img = cv2.imread(img_path)
-
-    # Run preprocessing
-    results = preprocess_image(img)
-
-    # Save outputs
     output_dir = os.path.join("outputs", "preprocessing", category)
-    save_results(results, output_dir, image_name="sample")
 
-    # Print metrics
-    print_metrics(results["metrics"])
+    avg_metrics = batch_preprocess(
+        image_paths,
+        save_samples=True,
+        sample_limit=5,
+        output_dir=output_dir
+    )
+
+    if avg_metrics:
+        print_metrics(avg_metrics)
 
 
+# -----------------------------
 if __name__ == "__main__":
-    run_preprocessing("bottle")
+    run_batch_preprocessing("bottle")
