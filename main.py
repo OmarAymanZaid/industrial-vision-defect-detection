@@ -22,7 +22,6 @@ def get_data_path():
 # -----------------------------
 # Main
 # -----------------------------
-# -----------------------------
 def run_batch_preprocessing(category="bottle"):
     DATA_PATH = get_data_path()
 
