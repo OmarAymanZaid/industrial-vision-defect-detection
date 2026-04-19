@@ -9,7 +9,7 @@ from modules.pyramid import *
 from modules.segmentation import *
 from modules.sift_matching import *
 from modules.utils import *
-
+from urllib import response
 # -----------------------------
 # Detect environment
 # -----------------------------
@@ -71,6 +71,25 @@ def run_single_pipeline(image_path):
     # STEP 2: Feature Detection
     # -----------------------------
     # corners = harris_detect(processed_img)
+
+
+    harris_img, harris_response = harris_detect(processed_img)
+
+    # Visualize Harris corners
+    harris_rgb = cv2.cvtColor(harris_img, cv2.COLOR_BGR2RGB)
+    plt.figure(figsize=(10,5))
+
+    plt.subplot(1,2,1)
+    plt.title("Grayscale Input")
+    plt.imshow(gray, cmap="gray")
+    plt.axis("off")
+
+    plt.subplot(1,2,2)
+    plt.title("Harris Corners")
+    plt.imshow(harris_rgb)
+    plt.axis("off")
+
+    plt.show()
 
     # -----------------------------
     # STEP 3: Multi-scale Analysis
