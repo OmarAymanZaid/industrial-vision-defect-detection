@@ -9,7 +9,7 @@ from modules.pyramid import *
 from modules.segmentation import *
 from modules.sift_matching import *
 from modules.utils import *
-from urllib import response
+
 # -----------------------------
 # Detect environment
 # -----------------------------
@@ -52,7 +52,7 @@ def run_batch_preprocessing(category="bottle"):
 # -----------------------------
 # 2. Single Image Pipeline (Inference)
 # -----------------------------
-def run_single_pipeline(image_path):
+def run_single_pipeline(image_path, ref_image_path=None):
     img = cv2.imread(image_path)
 
     if img is None:
@@ -63,17 +63,12 @@ def run_single_pipeline(image_path):
     # STEP 1: Preprocessing
     # -----------------------------
     preprocessed = preprocess_image(img)
-
-    # Choose ONE version (important design choice)
     processed_img = preprocessed["median"]
 
     # -----------------------------
     # STEP 2: Feature Detection
     # -----------------------------
-
-    #processed_img = cv2.cvtColor(processed_img, cv2.COLOR_BGR2GRAY) ##### Harris works better on grayscale #####
     harris_img, harris_response = harris_detect(processed_img)
-
     visualize_harris(processed_img, harris_img)
 
     # -----------------------------
@@ -82,24 +77,36 @@ def run_single_pipeline(image_path):
     g_pyr, l_pyr = build_pyramids(processed_img, levels=4)
 
     corner_counts = []
+    for level in g_pyr:
+        _, response = harris_detect(level)
+        corners = np.sum(response > 0.01 * response.max())
+        corner_counts.append(corners)
 
     results = {
         "corner_counts": corner_counts,
         "num_levels": len(g_pyr)
     }
 
-    for level in g_pyr:
-        _, response = harris_detect(level)
-        corners = np.sum(response > 0.01 * response.max())
-        corner_counts.append(corners)
-
     visualize_gaussian_pyramid(g_pyr)
     visualize_laplacian_pyramid(l_pyr)
 
     # -----------------------------
-    # STEP 4: Feature Extraction & Matching
+    # STEP 4: Feature Extraction & Matching (SIFT)
     # -----------------------------
-    # keypoints, descriptors = sift_extract(processed_img)
+    if ref_image_path is not None:
+        ref_img  = cv2.imread(ref_image_path)
+        ref_gray = preprocess_image(ref_img)["median"]
+
+        sift_results = sift_compare(processed_img, ref_gray, visualize=True)
+
+        print(f"\nSIFT Match Score : {sift_results['match_score']:.4f}")
+        print(f"Keypoints (query): {len(sift_results['kp1'])}")
+        print(f"Keypoints (ref)  : {len(sift_results['kp2'])}")
+        print(f"Good Matches     : {len(sift_results['matches'])}")
+    else:
+        keypoints, descriptors = sift_extract(processed_img)
+        visualize_keypoints(processed_img, keypoints, title="SIFT Keypoints")
+        print(f"\nSIFT Keypoints detected: {len(keypoints)}")
 
     # -----------------------------
     # STEP 5: Segmentation
@@ -114,9 +121,7 @@ def run_single_pipeline(image_path):
     # -----------------------------
     # FINAL OUTPUT
     # -----------------------------
-    # print(f"Prediction: {label}")
-
-    print("Pipeline executed (placeholders for remaining modules).")
+    print("Pipeline executed successfully.")
 
 
 # -----------------------------
@@ -128,5 +133,6 @@ if __name__ == "__main__":
     run_batch_preprocessing("bottle")
 
     # -------- Option 2: Run full pipeline (single image) --------
-    # sample_image = "data/bottle/test/good/000.png"
-    # run_single_pipeline(sample_image)
+    # sample_image = "data/bottle/test/broken_large/000.png"
+    # ref_image    = "data/bottle/test/good/000.png"
+    # run_single_pipeline(sample_image, ref_image_path=ref_image)
