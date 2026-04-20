@@ -70,31 +70,31 @@ def run_single_pipeline(image_path):
     # -----------------------------
     # STEP 2: Feature Detection
     # -----------------------------
-    # corners = harris_detect(processed_img)
 
-
+    #processed_img = cv2.cvtColor(processed_img, cv2.COLOR_BGR2GRAY) ##### Harris works better on grayscale #####
     harris_img, harris_response = harris_detect(processed_img)
 
-    # Visualize Harris corners
-    harris_rgb = cv2.cvtColor(harris_img, cv2.COLOR_BGR2RGB)
-    plt.figure(figsize=(10,5))
-
-    plt.subplot(1,2,1)
-    plt.title("Grayscale Input")
-    plt.imshow(gray, cmap="gray")
-    plt.axis("off")
-
-    plt.subplot(1,2,2)
-    plt.title("Harris Corners")
-    plt.imshow(harris_rgb)
-    plt.axis("off")
-
-    plt.show()
+    visualize_harris(processed_img, harris_img)
 
     # -----------------------------
     # STEP 3: Multi-scale Analysis
     # -----------------------------
-    # pyramid = build_pyramid(processed_img)
+    g_pyr, l_pyr = build_pyramids(processed_img, levels=4)
+
+    corner_counts = []
+
+    results = {
+        "corner_counts": corner_counts,
+        "num_levels": len(g_pyr)
+    }
+
+    for level in g_pyr:
+        _, response = harris_detect(level)
+        corners = np.sum(response > 0.01 * response.max())
+        corner_counts.append(corners)
+
+    visualize_gaussian_pyramid(g_pyr)
+    visualize_laplacian_pyramid(l_pyr)
 
     # -----------------------------
     # STEP 4: Feature Extraction & Matching
