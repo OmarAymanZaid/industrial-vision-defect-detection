@@ -52,7 +52,7 @@ def run_batch_preprocessing(category="bottle"):
 # -----------------------------
 # 2. Single Image Pipeline (Inference)
 # -----------------------------
-def run_single_pipeline(image_path):
+def run_single_pipeline(image_path, defect_type):
     img = cv2.imread(image_path)
 
     if img is None:
@@ -104,7 +104,17 @@ def run_single_pipeline(image_path):
     # -----------------------------
     # STEP 5: Segmentation
     # -----------------------------
-    # mask = segment(processed_img)
+    print(f"[*] Running Segmentation for: {defect_type}")
+    mask = segment_image(processed_img, defect_type=defect_type)
+    gt_mask = None
+    gt_path = image_path.replace("test", "ground_truth").replace(".png", "_mask.png")
+    if os.path.exists(gt_path):
+        gt_mask = cv2.imread(gt_path, cv2.IMREAD_GRAYSCALE)
+        iou = compute_iou(mask, gt_mask)
+        print(f"[+] Segmentation IoU: {iou:.4f}")
+        visualize_segmentation(img, mask, gt_mask, iou=iou, title="Defect Segmentation")
+    else:
+        visualize_overlay(img, mask, title=f"Segmented Mask ({defect_type})")
 
     # -----------------------------
     # STEP 6: Classification
@@ -129,4 +139,4 @@ if __name__ == "__main__":
 
     # -------- Option 2: Run full pipeline (single image) --------
     # sample_image = "data/bottle/test/good/000.png"
-    # run_single_pipeline(sample_image)
+    # run_single_pipeline(sample_image, defect_type="good")
