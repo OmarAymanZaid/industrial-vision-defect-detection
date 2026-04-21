@@ -7,8 +7,8 @@ from modules.harris import *
 from modules.preprocessing import *
 from modules.pyramid import *
 from modules.segmentation import *
-from modules.sift_matching import *
-
+from modules.utils import *
+from urllib import response
 # -----------------------------
 # Detect environment
 # -----------------------------
@@ -19,37 +19,123 @@ def get_data_path():
 
 
 # -----------------------------
-# Main
+# 1. Batch Preprocessing (Evaluation)
 # -----------------------------
-def run_preprocessing(category="bottle"):
+def run_batch_preprocessing(category="bottle"):
     DATA_PATH = get_data_path()
 
-    # Pick ONE sample image (start simple)
-    sample_path = os.path.join(
+    print(f"\nLoading dataset: {category}")
+
+    image_paths = load_image_paths(
         DATA_PATH,
-        category,
-        "train",
-        "good"
+        category=category,
+        split="train",
+        max_images=100
     )
 
-    # Get first image
-    img_name = os.listdir(sample_path)[0]
-    img_path = os.path.join(sample_path, img_name)
+    print(f"Total images loaded: {len(image_paths)}")
 
-    print(f"Processing: {img_path}")
-
-    img = cv2.imread(img_path)
-
-    # Run preprocessing
-    results = preprocess_image(img)
-
-    # Save outputs
     output_dir = os.path.join("outputs", "preprocessing", category)
-    save_results(results, output_dir, image_name="sample")
 
-    # Print metrics
-    print_metrics(results["metrics"])
+    avg_metrics = batch_preprocess(
+        image_paths,
+        save_samples=True,
+        sample_limit=5,
+        output_dir=output_dir
+    )
+
+    if avg_metrics:
+        print_metrics(avg_metrics)
 
 
+# -----------------------------
+# 2. Single Image Pipeline (Inference)
+# -----------------------------
+def run_single_pipeline(image_path, defect_type):
+    img = cv2.imread(image_path)
+
+    if img is None:
+        print("Error: Image not found")
+        return
+
+    # -----------------------------
+    # STEP 1: Preprocessing
+    # -----------------------------
+    preprocessed = preprocess_image(img)
+
+    # Choose ONE version (important design choice)
+    processed_img = preprocessed["median"]
+
+    # -----------------------------
+    # STEP 2: Feature Detection
+    # -----------------------------
+
+    #processed_img = cv2.cvtColor(processed_img, cv2.COLOR_BGR2GRAY) ##### Harris works better on grayscale #####
+    harris_img, harris_response = harris_detect(processed_img)
+
+    visualize_harris(processed_img, harris_img)
+
+    # -----------------------------
+    # STEP 3: Multi-scale Analysis
+    # -----------------------------
+    g_pyr, l_pyr = build_pyramids(processed_img, levels=4)
+
+    corner_counts = []
+
+    results = {
+        "corner_counts": corner_counts,
+        "num_levels": len(g_pyr)
+    }
+
+    for level in g_pyr:
+        _, response = harris_detect(level)
+        corners = np.sum(response > 0.01 * response.max())
+        corner_counts.append(corners)
+
+    visualize_gaussian_pyramid(g_pyr)
+    visualize_laplacian_pyramid(l_pyr)
+
+    # -----------------------------
+    # STEP 4: Feature Extraction & Matching
+    # -----------------------------
+    # keypoints, descriptors = sift_extract(processed_img)
+
+    # -----------------------------
+    # STEP 5: Segmentation
+    # -----------------------------
+    print(f"[*] Running Segmentation for: {defect_type}")
+    mask = segment_image(processed_img, defect_type=defect_type)
+    gt_mask = None
+    gt_path = image_path.replace("test", "ground_truth").replace(".png", "_mask.png")
+    if os.path.exists(gt_path):
+        gt_mask = cv2.imread(gt_path, cv2.IMREAD_GRAYSCALE)
+        iou = compute_iou(mask, gt_mask)
+        print(f"[+] Segmentation IoU: {iou:.4f}")
+        visualize_segmentation(img, mask, gt_mask, iou=iou, title="Defect Segmentation")
+    else:
+        visualize_overlay(img, mask, title=f"Segmented Mask ({defect_type})")
+
+    # -----------------------------
+    # STEP 6: Classification
+    # -----------------------------
+    # label = classify(processed_img, mask)
+
+    # -----------------------------
+    # FINAL OUTPUT
+    # -----------------------------
+    # print(f"Prediction: {label}")
+
+    print("Pipeline executed (placeholders for remaining modules).")
+
+
+# -----------------------------
+# ENTRY POINT
+# -----------------------------
 if __name__ == "__main__":
-    run_preprocessing("bottle")
+
+    # -------- Option 1: Evaluate preprocessing --------
+    run_batch_preprocessing("bottle")
+
+    # -------- Option 2: Run full pipeline (single image) --------
+    # sample_image = "data/bottle/test/good/000.png"
+    # run_single_pipeline(sample_image, defect_type="good")
