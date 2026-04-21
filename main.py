@@ -7,6 +7,7 @@ from modules.harris import *
 from modules.preprocessing import *
 from modules.pyramid import *
 from modules.segmentation import *
+from modules.sift_matching import *
 from modules.utils import *
 from urllib import response
 # -----------------------------

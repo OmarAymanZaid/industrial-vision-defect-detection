@@ -148,4 +148,3 @@ def batch_preprocess(image_paths, save_samples=False, sample_limit=5, output_dir
     }
 
     return avg_metrics
-# preprocessing
