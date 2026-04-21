@@ -104,7 +104,17 @@ def run_single_pipeline(image_path):
     # -----------------------------
     # STEP 5: Segmentation
     # -----------------------------
-    # mask = segment(processed_img)
+    print(f"[*] Running Segmentation for: {defect_type}")
+    mask = segment_image(processed_img, defect_type=defect_type)
+    gt_mask = None
+    gt_path = image_path.replace("test", "ground_truth").replace(".png", "_mask.png")
+    if os.path.exists(gt_path):
+        gt_mask = cv2.imread(gt_path, cv2.IMREAD_GRAYSCALE)
+        iou = compute_iou(mask, gt_mask)
+        print(f"[+] Segmentation IoU: {iou:.4f}")
+        visualize_segmentation(img, mask, gt_mask, iou=iou, title="Defect Segmentation")
+    else:
+        visualize_overlay(img, mask, title=f"Segmented Mask ({defect_type})")
 
     # -----------------------------
     # STEP 6: Classification
