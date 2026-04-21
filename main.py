@@ -7,7 +7,6 @@ from modules.harris import *
 from modules.preprocessing import *
 from modules.pyramid import *
 from modules.segmentation import *
-from modules.sift_matching import *
 from modules.utils import *
 from urllib import response
 # -----------------------------
@@ -52,7 +51,7 @@ def run_batch_preprocessing(category="bottle"):
 # -----------------------------
 # 2. Single Image Pipeline (Inference)
 # -----------------------------
-def run_single_pipeline(image_path):
+def run_single_pipeline(image_path, defect_type):
     img = cv2.imread(image_path)
 
     if img is None:
@@ -139,4 +138,4 @@ if __name__ == "__main__":
 
     # -------- Option 2: Run full pipeline (single image) --------
     # sample_image = "data/bottle/test/good/000.png"
-    # run_single_pipeline(sample_image)
+    # run_single_pipeline(sample_image, defect_type="good")
