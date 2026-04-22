@@ -1,8 +1,5 @@
 import os
 import numpy as np
-from modules.preprocessing import preprocess_image
-from modules.segmentation import segment_image
-from modules.features import extract_features
 
 def load_image_paths(data_path, category="bottle", split="train", max_images=None):
     """
