@@ -93,7 +93,7 @@ def run_single_pipeline(image_path, defect_type=None, clf_model=None, ref_image_
     # -----------------------------
     # STEP 2: Segmentation
     # -----------------------------
-    mask = segment_image(processed_img, defect_type=defect_type)
+    mask = segment_image(img, defect_type=defect_type)
     results["mask"] = mask
 
     # -----------------------------
