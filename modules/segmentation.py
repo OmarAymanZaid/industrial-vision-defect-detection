@@ -165,6 +165,10 @@ def segment_image(img_bgr, ref_good_bgr=None, defect_type=None, strategy=None):
     -------
     np.ndarray  Binary mask (H×W), 255 = defect region
     """
+
+    if len(img_bgr.shape) == 2:
+        img_bgr = cv2.cvtColor(img_bgr, cv2.COLOR_GRAY2BGR)
+
     if defect_type == "good":
         h, w = img_bgr.shape[:2]
         return np.zeros((h, w), dtype=np.uint8)
