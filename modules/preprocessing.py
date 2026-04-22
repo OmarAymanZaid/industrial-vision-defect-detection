@@ -74,29 +74,6 @@ def preprocess_image(img):
 
 
 # -----------------------------
-# Saving Utilities
-# -----------------------------
-def save_results(results, output_dir, image_name="image"):
-    os.makedirs(output_dir, exist_ok=True)
-
-    cv2.imwrite(os.path.join(output_dir, f"{image_name}_gray.png"), results["gray"])
-    cv2.imwrite(os.path.join(output_dir, f"{image_name}_gaussian.png"), results["gaussian"])
-    cv2.imwrite(os.path.join(output_dir, f"{image_name}_median.png"), results["median"])
-
-
-# -----------------------------
-# Logging
-# -----------------------------
-def print_metrics(metrics):
-    print("\n=== Preprocessing Metrics ===")
-
-    for method, values in metrics.items():
-        print(f"\n[{method.upper()}]")
-        print(f"MSE  : {values['mse']:.4f}")
-        print(f"PSNR : {values['psnr']:.4f}")
-
-
-# -----------------------------
 # Batch Preprocessing
 # -----------------------------
 def batch_preprocess(image_paths, save_samples=False, sample_limit=5, output_dir=None):
@@ -148,3 +125,27 @@ def batch_preprocess(image_paths, save_samples=False, sample_limit=5, output_dir
     }
 
     return avg_metrics
+
+
+# -----------------------------
+# Saving Utilities
+# -----------------------------
+def save_results(results, output_dir, image_name="image"):
+    os.makedirs(output_dir, exist_ok=True)
+
+    cv2.imwrite(os.path.join(output_dir, f"{image_name}_gray.png"), results["gray"])
+    cv2.imwrite(os.path.join(output_dir, f"{image_name}_gaussian.png"), results["gaussian"])
+    cv2.imwrite(os.path.join(output_dir, f"{image_name}_median.png"), results["median"])
+
+
+# -----------------------------
+# Logging
+# -----------------------------
+def print_metrics(metrics):
+    print("\n=== Preprocessing Metrics ===")
+
+    for method, values in metrics.items():
+        print(f"\n[{method.upper()}]")
+        print(f"MSE  : {values['mse']:.4f}")
+        print(f"PSNR : {values['psnr']:.4f}")
+
