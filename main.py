@@ -20,12 +20,10 @@ from modules.utils import *
 # → classify(features)
 
 
-
-
 # -----------------------------
 #  Single Image Pipeline (Inference)
 # -----------------------------
-def run_single_pipeline(defect_type, image_path, ref_image_path=None):
+def run_single_pipeline(image_path, defect_type, ref_image_path=None):
     img = cv2.imread(image_path)
 
     if img is None:
@@ -111,11 +109,6 @@ def run_single_pipeline(defect_type, image_path, ref_image_path=None):
 # ENTRY POINT
 # -----------------------------
 if __name__ == "__main__":
-
-    # -------- Option 1: Evaluate preprocessing --------
-    run_batch_preprocessing("bottle")
-
-    # -------- Option 2: Run full pipeline (single image) --------
-    # sample_image = "data/bottle/test/broken_large/000.png"
-    # ref_image    = "data/bottle/test/good/000.png"
-    # run_single_pipeline(defect_type="good", sample_image, ref_image_path=ref_image)
+    sample_image = "data/bottle/test/broken_large/000.png"
+    ref_image    = "data/bottle/test/good/000.png"
+    run_single_pipeline(sample_image, defect_type="good", ref_image_path=ref_image)
