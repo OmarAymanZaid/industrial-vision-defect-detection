@@ -2,6 +2,7 @@ from tqdm import tqdm
 import cv2
 import numpy as np
 import os
+from modules.utils import load_image_paths, get_data_path
 
 # -----------------------------
 # Metrics
@@ -125,6 +126,33 @@ def batch_preprocess(image_paths, save_samples=False, sample_limit=5, output_dir
     }
 
     return avg_metrics
+
+
+def run_batch_preprocessing(category="bottle"):
+    DATA_PATH = get_data_path()
+
+    print(f"\nLoading dataset: {category}")
+
+    image_paths = load_image_paths(
+        DATA_PATH,
+        category=category,
+        split="train",
+        max_images=100
+    )
+
+    print(f"Total images loaded: {len(image_paths)}")
+
+    output_dir = os.path.join("outputs", "preprocessing", category)
+
+    avg_metrics = batch_preprocess(
+        image_paths,
+        save_samples=True,
+        sample_limit=5,
+        output_dir=output_dir
+    )
+
+    if avg_metrics:
+        print_metrics(avg_metrics)
 
 
 # -----------------------------

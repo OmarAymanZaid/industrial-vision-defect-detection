@@ -19,47 +19,11 @@ from modules.utils import *
 # → features = extract_features(img)
 # → classify(features)
 
-# -----------------------------
-# Detect environment
-# -----------------------------
-def get_data_path():
-    if os.path.exists("/kaggle/input"):
-        return "/kaggle/input/datasets/ipythonx/mvtec-ad"
-    return "data"
+
 
 
 # -----------------------------
-# 1. Batch Preprocessing (Evaluation)
-# -----------------------------
-def run_batch_preprocessing(category="bottle"):
-    DATA_PATH = get_data_path()
-
-    print(f"\nLoading dataset: {category}")
-
-    image_paths = load_image_paths(
-        DATA_PATH,
-        category=category,
-        split="train",
-        max_images=100
-    )
-
-    print(f"Total images loaded: {len(image_paths)}")
-
-    output_dir = os.path.join("outputs", "preprocessing", category)
-
-    avg_metrics = batch_preprocess(
-        image_paths,
-        save_samples=True,
-        sample_limit=5,
-        output_dir=output_dir
-    )
-
-    if avg_metrics:
-        print_metrics(avg_metrics)
-
-
-# -----------------------------
-# 2. Single Image Pipeline (Inference)
+#  Single Image Pipeline (Inference)
 # -----------------------------
 def run_single_pipeline(defect_type, image_path, ref_image_path=None):
     img = cv2.imread(image_path)
