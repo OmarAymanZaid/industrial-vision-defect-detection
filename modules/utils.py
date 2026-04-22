@@ -23,3 +23,11 @@ def load_image_paths(data_path, category="bottle", split="train", max_images=Non
         image_paths = image_paths[:max_images]
 
     return image_paths
+
+# -----------------------------
+# Detect environment
+# -----------------------------
+def get_data_path():
+    if os.path.exists("/kaggle/input"):
+        return "/kaggle/input/datasets/ipythonx/mvtec-ad"
+    return "data"
