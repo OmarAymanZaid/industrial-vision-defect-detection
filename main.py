@@ -10,6 +10,15 @@ from modules.segmentation import *
 from modules.sift_matching import *
 from modules.utils import *
 
+# -----------------------
+# Clean final pipeline
+# -----------------------
+# img
+# → preprocess(img)
+# → segment(img)
+# → features = extract_features(img)
+# → classify(features)
+
 # -----------------------------
 # Detect environment
 # -----------------------------
