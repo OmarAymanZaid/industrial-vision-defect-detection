@@ -152,6 +152,14 @@ def run_single_pipeline(image_path, defect_type=None, clf_model=None, ref_image_
         results["harris"] = harris_img
         visualize_harris(processed_img, harris_img)
 
+        print("\n--- Threshold Tuning Analysis ---")
+        harris_img_gs = cv2.cvtColor(harris_img, cv2.COLOR_BGR2GRAY)
+        threshold_results = analyze_threshold_tuning(harris_img_gs)
+        plot_threshold_results(threshold_results)
+
+        print("\n--- Comparison between Thresholds ---")
+        plot_threshold_results(threshold_results)
+
         # Pyramid
         g_pyr, l_pyr = build_pyramids(processed_img, levels=4)
 

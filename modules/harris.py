@@ -36,6 +36,32 @@ def harris_detect(gray, block_size=2, ksize=3, k=0.04, threshold=0.01):
     return corners_img, response
 
 
+def analyze_threshold_tuning(gray):
+    thresholds = [0.001, 0.01, 0.05, 0.1, 0.2]
+    results = []
+
+    for t in thresholds:
+        corners_img, response = harris_detect(gray, threshold=t)
+        count = np.sum(response > t * response.max())
+        results.append((t, count))
+        print(f"threshold={t}: {count} corners")
+
+    return results
+
+
+def plot_threshold_results(results):
+    thresholds = [r[0] for r in results]
+    counts = [r[1] for r in results]
+
+    plt.figure(figsize=(6,4))
+    plt.plot(thresholds, counts, marker='o')
+    plt.title("Harris Threshold Tuning")
+    plt.xlabel("Threshold")
+    plt.ylabel("Number of Corners")
+    plt.grid()
+    plt.show()
+
+
 def visualize_harris(gray, corners_img, title="Harris Corner Detection"):
     
     if len(gray.shape) == 3:
