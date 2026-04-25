@@ -2,6 +2,7 @@ import numpy as np
 from sklearn.ensemble import AdaBoostClassifier
 from sklearn.naive_bayes import GaussianNB
 from sklearn.metrics import classification_report, accuracy_score
+import joblib
 
 
 class IndustrialClassifier:
@@ -24,14 +25,27 @@ class IndustrialClassifier:
 
     def predict(self, features):
         if not self.is_trained:
-            return "Model not trained!"
+            raise Exception("Model not trained!")
 
-        pred = self.model.predict([features])[0]
+        return self.model.predict([features])[0]
+
+    def predict_label(self, features):
+        if not self.is_trained:
+            raise Exception("Model not trained!")
+        
+        pred = self.predict(features)
         return "Defective" if pred == 1 else "Non-Defective"
 
     def evaluate(self, X_test, y_test):
+        if not self.is_trained:
+            raise Exception("Model not trained!")
+        
         y_pred = self.model.predict(X_test)
 
         print("\n=== Classification Report ===")
         print(f"Accuracy: {accuracy_score(y_test, y_pred):.4f}")
         print(classification_report(y_test, y_pred, target_names=['Good', 'Defective']))
+
+    def load(self, path="../model.pkl"):
+        self.model = joblib.load(path)
+        self.is_trained = True

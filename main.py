@@ -10,6 +10,8 @@ from modules.segmentation import *
 from modules.sift_matching import *
 from modules.features import *
 from modules.utils import *
+from tqdm import tqdm
+import joblib
 
 # -----------------------
 # Clean final pipeline
@@ -25,10 +27,6 @@ from modules.utils import *
 # Helpers
 # --------
 def build_dataset(data_path, category, max_samples=50):
-
-
-    import os, cv2
-    from tqdm import tqdm
 
     X, y = [], []
 
@@ -120,8 +118,12 @@ def run_single_pipeline(image_path, defect_type=None, clf_model=None, ref_image_
     # -----------------------------
     prediction = None
 
-    if clf_model is not None and clf_model.is_trained:
-        prediction = clf_model.predict(features)
+    clf_model = IndustrialClassifier()
+    clf_model.load("../model.pkl")
+    
+    if clf_model is not None : # it's impossible to be None but just in case :) (بصراحة حاسس الكود كده شكلو اشيك)
+
+        prediction = clf_model.predict_label(features)
         results["prediction"] = prediction
 
         print("\n=== FINAL RESULT ===")
