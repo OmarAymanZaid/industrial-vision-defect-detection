@@ -1,7 +1,7 @@
-from tqdm import tqdm
 import cv2
-import numpy as np
 import os
+import numpy as np
+from tqdm import tqdm
 from modules.utils import load_image_paths, get_data_path
 
 # -----------------------------
