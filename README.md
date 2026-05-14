@@ -123,33 +123,6 @@ All modules are integrated into a single workflow for:
 | Segmentation      | IoU (Intersection over Union) |
 | Classification    | Accuracy, Precision, Recall   |
 
----
-
-## 📂 Project Structure
-
-```
-industrial-vision-defect-detection/
-│
-├── data/                  # Dataset
-├── outputs/
-├── modules/               # Saved results & visualizations
-│     │
-│     ├── classification.py
-│     ├── harris.py
-│     ├── preprocessing.py
-│     ├── pyramid.py
-│     ├── segmentation.py
-│     └── sift_matching.py
-│
-│
-├── utils.py
-├── main.py
-├── requirements.txt
-└── README.md
-```
-
----
-
 ## 📥 Dataset
 
 This project uses the **MVTec Anomaly Detection Dataset**.
